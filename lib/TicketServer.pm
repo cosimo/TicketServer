@@ -18,6 +18,7 @@ sub new {
         _dsn => $args->{dsn},
         _user => $args->{user},
         _password => $args->{password},
+        _engine => $args->{engine} || 'MyISAM',
     };
 
     bless $self, $class;
@@ -112,11 +113,12 @@ sub create_sequence {
     $name =~ s{\W}{}g;
     $start_value =~ s{\D}{}g;
 
+    my $engine = $self->{_engine};
     my $sql = <<SQL;
 CREATE TABLE IF NOT EXISTS $name (
     id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     stub char(1) NOT NULL UNIQUE DEFAULT ''
-) ENGINE=MyISAM AUTO_INCREMENT=$start_value CHARACTER SET='UTF8'
+) ENGINE=$engine AUTO_INCREMENT=$start_value CHARACTER SET='UTF8'
 SQL
     my $created = 0;
 
