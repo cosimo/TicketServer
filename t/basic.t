@@ -15,6 +15,19 @@ my $dsn      = "DBI:mysql:dbname=$dbname;host=$host;port=$port";
 my $user     = 'root';
 my $password = '';
 
+#
+# Change here if you have custom auto_increment settings
+#
+my $auto_incr_incr =   1;  # 10
+my $auto_incr_offset = 0;  # 2
+
+sub auto_incr_num {
+    my $n = shift;
+    $n *= $auto_incr_incr;
+    $n += $auto_incr_offset;
+    return $n;
+}
+
 my $tm = TicketServer->new({
     dsn => $dsn,
     user => $user,
@@ -23,6 +36,7 @@ my $tm = TicketServer->new({
 
 ok $tm, 'TicketServer object created';
 
+
 my $seq = 'users_sequence';
 ok $tm->reset_sequence($seq, 800_000_000_000),
     "reset_sequence() with value";
@@ -30,7 +44,7 @@ ok $tm->reset_sequence($seq, 800_000_000_000),
 my $count = 10;
 while ($count--) {
     my $next = $tm->next_val($seq);
-    is $next => 800_000_000_009 - $count,
+    is $next => 800_000_000_000 + auto_incr_num(9 - $count),
         "reset_sequence() with a value works [$next]";
 }
 
@@ -40,7 +54,7 @@ $count = 10;
 
 while ($count--) {
     my $next = $tm->next_val($seq);
-    is $next => 10 - $count,
+    is $next => 1 + auto_incr_num(9 - $count),
         "reset_sequence() without values + next_val() works [$next]";
     #diag $next;
 }
@@ -51,7 +65,7 @@ $count = 10;
 
 while ($count--) {
     my $next = $tm->next_val($seq);
-    is $next => 1009 - $count,
+    is $next => 1000 + auto_incr_num(9 - $count),
         "reset_sequence() again with a value [$next]";
     #diag $next;
 }
@@ -65,7 +79,7 @@ $count = 100;
 
 while ($count--) {
     my $next = $tm->next_val($seq);
-    is $next => 500_000_000_000_099 - $count,
+    is $next => 500_000_000_000_000 + auto_incr_num(99 - $count),
         "reset_sequence() again with a value [$next]";
     #diag $next;
 }
