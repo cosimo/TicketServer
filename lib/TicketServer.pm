@@ -34,11 +34,7 @@ sub connect {
         Carp::croak("No DSN or user. Can't connect to tickets database!");
     }
 
-    my $dbh = DBI->connect($dsn, $user, $pass, {
-            RaiseError => 1,
-            PrintError => 1
-    })
-        or return;
+    my $dbh = DBI->connect($dsn, $user, $pass) or return;
 
     if (! $dbh->ping()) {
         return;
